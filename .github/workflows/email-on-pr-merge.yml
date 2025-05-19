@@ -1,0 +1,33 @@
+name: Email Notification on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  notify:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "🔔 PR Merged: ${{ github.event.pull_request.title }}"
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_FROM }}
+          body: |
+            Hello,
+
+            A pull request was just merged into the main branch.
+
+            Repository: ${{ github.repository }}
+            Title: ${{ github.event.pull_request.title }}
+            Merged By: ${{ github.event.pull_request.merged_by.login }}
+
+            🎉 Cheers from GitHub Actions!
